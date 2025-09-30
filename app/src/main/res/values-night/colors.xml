@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gradient_start">#FF0D1B3D</color>
+    <color name="gradient_end">#FF3F1B6D</color>
+    <color name="gradient_alt_start">#FF102A5C</color>
+    <color name="gradient_alt_end">#FF5B1F6E</color>
+    <color name="surface_glass">#45FFFFFF</color>
+    <color name="surface_glass_alt">#24FFFFFF</color>
+    <color name="outline_glow">#40FFFFFF</color>
+</resources>
