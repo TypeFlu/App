@@ -11,12 +11,12 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-    applicationId = "me.typeflu.calculator"
+        applicationId = "me.typeflu.calculator"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0.0"
-        vectorDrawables.useSupportLibrary = true
+    vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -37,6 +37,10 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = false
+    }
+    androidResources {
+        localeFilters += setOf("en")
     }
 
     sourceSets.named("main") {
@@ -45,7 +49,7 @@ android {
 
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/{AL2.0,LGPL2.1,LICENSE*,NOTICE*,DEPENDENCIES,*.version,*.kotlin_module}"
         }
     }
 }
@@ -65,15 +69,17 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
-    implementation("com.google.android.material:material:1.13.0")
+    implementation(libs.material)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.bundles.compose)
+    implementation(libs.coil.compose)
 
-    testImplementation("junit:junit:4.13.2")
+
+    testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

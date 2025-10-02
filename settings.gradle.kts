@@ -16,6 +16,6 @@ dependencyResolutionManagement {
 	}
 }
 
-rootProject.name = "t-calculator"
+rootProject.name = "App"
 
 include(":app")

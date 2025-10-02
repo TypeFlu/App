@@ -1,7 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <group android:pivotX="54" android:pivotY="54" android:scaleX="0.9" android:scaleY="0.9">
-        <path android:fillColor="#FFFFFFFF" android:fillAlpha="0.9" android:pathData="M54,20C72,20 85,33 85,51C85,69 72,82 54,82C36,82 23,69 23,51C23,33 36,20 54,20ZM54,30C41.297,30 31,40.297 31,53C31,65.703 41.297,76 54,76C66.703,76 77,65.703 77,53C77,40.297 66.703,30 54,30Z" />
-        <path android:fillColor="#FFFFFFFF" android:pathData="M45,45H57C61.418,45 65,48.582 65,53C65,57.418 61.418,61 57,61H45C40.582,61 37,57.418 37,53C37,48.582 40.582,45 45,45ZM57,53C58.105,53 59,52.105 59,51C59,49.895 58.105,49 57,49H45C43.895,49 43,49.895 43,51C43,52.105 43.895,53 45,53Z" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="50"
+    android:viewportHeight="50">
+    <group
+        android:scaleX="0.7"
+        android:scaleY="0.7"
+        android:pivotX="25"
+        android:pivotY="25">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M 14 4 C 8.4886661 4 4 8.4886661 4 14 L 4 36 C 4 41.511334 8.4886661 46 14 46 L 36 46 C 41.511334 46 46 41.511334 46 36 L 46 14 C 46 8.4886661 41.511334 4 36 4 L 14 4 z M 18 10 L 32 10 C 34.209 10 36 11.791 36 14 L 36 36 C 36 38.209 34.209 40 32 40 L 18 40 C 15.791 40 14 38.209 14 36 L 14 14 C 14 11.791 15.791 10 18 10 z M 18 13 C 17.448 13 17 13.448 17 14 L 17 18 C 17 18.552 17.448 19 18 19 L 32 19 C 32.552 19 33 18.552 33 18 L 33 14 C 33 13.448 32.552 13 32 13 L 18 13 z M 19 21 A 2 2 0 0 0 19 25 A 2 2 0 0 0 19 21 z M 25 21 A 2 2 0 0 0 25 25 A 2 2 0 0 0 25 21 z M 31 21 A 2 2 0 0 0 31 25 A 2 2 0 0 0 31 21 z M 19 27 A 2 2 0 0 0 19 31 A 2 2 0 0 0 19 27 z M 25 27 A 2 2 0 0 0 25 31 A 2 2 0 0 0 25 27 z M 31 27 A 2 2 0 0 0 31 31 A 2 2 0 0 0 31 27 z M 19 33 C 17.895 33 17 33.895 17 35 C 17 36.105 17.895 37 19 37 L 25 37 C 26.105 37 27 36.105 27 35 C 27 33.895 26.105 33 25 33 L 19 33 z M 31 33 A 2 2 0 0 0 31 37 A 2 2 0 0 0 31 33 z"/>
     </group>
 </vector>

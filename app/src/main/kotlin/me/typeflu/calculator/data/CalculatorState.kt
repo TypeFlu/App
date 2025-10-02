@@ -12,6 +12,4 @@ data class CalculatorState(
     val lastOperation: CalculatorOperation? = null,
     val justEvaluated: Boolean = false,
     val isError: Boolean = false
-) {
-    val hasMemory: Boolean get() = memory != null
-}
+)

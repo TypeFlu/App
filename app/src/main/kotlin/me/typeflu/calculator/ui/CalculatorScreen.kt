@@ -1,5 +1,6 @@
 package me.typeflu.calculator.ui
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -13,20 +14,26 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Wallpaper
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,10 +47,9 @@ import me.typeflu.calculator.data.CalculatorAction
 import me.typeflu.calculator.data.CalculatorOperation
 import me.typeflu.calculator.data.CalculatorState
 import me.typeflu.calculator.data.CalculatorViewModel
-import me.typeflu.calculator.ui.components.AuroraBackground
 import me.typeflu.calculator.ui.components.CalculatorButton
-import me.typeflu.calculator.ui.components.CalculatorChip
 import me.typeflu.calculator.ui.components.KeyStyle
+import me.typeflu.calculator.ui.components.WallpaperBackdrop
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -56,8 +62,8 @@ private data class CalculatorKey(
 )
 
 private val keyLayout = listOf(
-    CalculatorKey("C", CalculatorAction.Clear, KeyStyle.Function),
-    CalculatorKey("±", CalculatorAction.ToggleSign, KeyStyle.Function),
+    CalculatorKey("⌫", CalculatorAction.Delete, KeyStyle.Function),
+    CalculatorKey("AC", CalculatorAction.Clear, KeyStyle.Function),
     CalculatorKey("%", CalculatorAction.Percent, KeyStyle.Function),
     CalculatorKey("÷", CalculatorAction.Operation(CalculatorOperation.Divide), KeyStyle.Secondary),
     CalculatorKey("7", CalculatorAction.Digit(7), KeyStyle.Primary),
@@ -74,18 +80,28 @@ private val keyLayout = listOf(
     CalculatorKey("+", CalculatorAction.Operation(CalculatorOperation.Add), KeyStyle.Secondary),
     CalculatorKey("0", CalculatorAction.Digit(0), KeyStyle.Primary, span = 2),
     CalculatorKey(".", CalculatorAction.Decimal, KeyStyle.Primary),
-    CalculatorKey("⌫", CalculatorAction.Delete, KeyStyle.Function),
-    CalculatorKey("=", CalculatorAction.Equals, KeyStyle.Accent, span = 4)
+    CalculatorKey("=", CalculatorAction.Equals, KeyStyle.Accent, span = 2)
 )
 
 @Composable
 fun CalculatorRoute(
     modifier: Modifier = Modifier,
-    viewModel: CalculatorViewModel = viewModel()
+    viewModel: CalculatorViewModel = viewModel(),
+    windowSizeClass: WindowSizeClass,
+    wallpaperUri: Uri?,
+    onSelectWallpaper: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val darkTheme = isSystemInDarkTheme()
-    CalculatorScreen(state = state, darkTheme = darkTheme, modifier = modifier, onAction = viewModel::onAction)
+    CalculatorScreen(
+        state = state,
+        darkTheme = darkTheme,
+        windowSizeClass = windowSizeClass,
+        wallpaperUri = wallpaperUri,
+        onSelectWallpaper = onSelectWallpaper,
+        modifier = modifier,
+        onAction = viewModel::onAction
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
@@ -93,55 +109,81 @@ fun CalculatorRoute(
 fun CalculatorScreen(
     state: CalculatorState,
     darkTheme: Boolean,
+    windowSizeClass: WindowSizeClass,
+    wallpaperUri: Uri?,
+    onSelectWallpaper: () -> Unit,
     modifier: Modifier = Modifier,
     onAction: (CalculatorAction) -> Unit
 ) {
-    val accentColor by animateColorAsState(
+    val displayColor by animateColorAsState(
         targetValue = if (state.isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
-        label = "accent"
+        label = "display"
     )
+    val columns = when (windowSizeClass.widthSizeClass) {
+        WindowWidthSizeClass.Compact -> 4
+        else -> 4
+    }
+    val layout = remember { keyLayout }
     Box(modifier = modifier.fillMaxSize()) {
-        AuroraBackground(modifier = Modifier.fillMaxSize(), darkTheme = darkTheme)
+        WallpaperBackdrop(
+            modifier = Modifier.fillMaxSize(),
+            darkTheme = darkTheme,
+            wallpaperUri = wallpaperUri
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 28.dp),
+                .systemBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            DisplayArea(state = state, textColor = accentColor)
-            Spacer(modifier = Modifier.height(18.dp))
-            MemoryRow(state = state, onAction = onAction)
-            Spacer(modifier = Modifier.height(18.dp))
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-                contentPadding = PaddingValues(bottom = 8.dp)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                items(keyLayout, span = { GridItemSpan(it.span) }) { key ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    IconButton(onClick = onSelectWallpaper) {
+                        Icon(
+                            imageVector = Icons.Outlined.Wallpaper,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                DisplayArea(
+                    state = state,
+                    textColor = displayColor,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(columns),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(bottom = 12.dp)
+            ) {
+                items(layout, span = { GridItemSpan(it.span) }) { key ->
                     CalculatorButton(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(if (key.label == "=") 78.dp else 68.dp),
+                            .aspectRatio(if (key.span > 1) key.span.toFloat() else 1f),
                         style = key.style,
                         onClick = { onAction(key.action) }
                     ) {
                         Text(
                             text = key.label,
                             style = when (key.style) {
-                                KeyStyle.Accent -> MaterialTheme.typography.displayMedium
+                                KeyStyle.Accent -> MaterialTheme.typography.displaySmall
                                 KeyStyle.Secondary -> MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold)
-                                KeyStyle.Function -> MaterialTheme.typography.titleLarge
-                                KeyStyle.Primary -> MaterialTheme.typography.titleLarge
+                                KeyStyle.Function -> MaterialTheme.typography.titleMedium
+                                KeyStyle.Primary -> MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold)
                             },
-                            textAlign = TextAlign.Center,
-                            color = when (key.style) {
-                                KeyStyle.Accent -> MaterialTheme.colorScheme.onPrimary
-                                KeyStyle.Secondary -> MaterialTheme.colorScheme.onPrimary
-                                KeyStyle.Function -> MaterialTheme.colorScheme.onSurface
-                                KeyStyle.Primary -> MaterialTheme.colorScheme.onSurface
-                            }
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -152,18 +194,16 @@ fun CalculatorScreen(
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun DisplayArea(state: CalculatorState, textColor: Color) {
+private fun DisplayArea(state: CalculatorState, textColor: Color, modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp, bottom = 8.dp),
+        modifier = modifier.padding(horizontal = 12.dp),
         horizontalAlignment = Alignment.End
     ) {
         val expression = state.expression
         if (expression.isNotBlank()) {
             Text(
                 text = expression,
-                style = MaterialTheme.typography.bodyLarge.copy(color = textColor.copy(alpha = 0.65f)),
+                style = MaterialTheme.typography.bodyLarge.copy(color = textColor.copy(alpha = 0.6f)),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -171,42 +211,21 @@ private fun DisplayArea(state: CalculatorState, textColor: Color) {
         AnimatedContent(
             targetState = formatDisplay(state.display),
             transitionSpec = {
-                fadeIn(animationSpec = tween(durationMillis = 260)) togetherWith fadeOut(animationSpec = tween(durationMillis = 220))
+                fadeIn(animationSpec = tween(durationMillis = 240)) togetherWith
+                    fadeOut(animationSpec = tween(durationMillis = 200))
             },
             label = "display"
         ) { value ->
             Text(
                 text = value,
-                style = MaterialTheme.typography.displayLarge.copy(color = textColor),
+                style = MaterialTheme.typography.displayLarge.copy(
+                    color = textColor,
+                    fontWeight = FontWeight.SemiBold
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.End
             )
-        }
-        if (state.hasMemory) {
-            Text(
-                text = "Memory",
-                style = MaterialTheme.typography.labelLarge.copy(color = textColor.copy(alpha = 0.7f)),
-                modifier = Modifier.padding(top = 6.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun MemoryRow(state: CalculatorState, onAction: (CalculatorAction) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        val memoryActions = listOf(
-            Triple("MC", CalculatorAction.MemoryClear, state.hasMemory),
-            Triple("MR", CalculatorAction.MemoryRecall, state.hasMemory),
-            Triple("M+", CalculatorAction.MemoryAdd, false),
-            Triple("M−", CalculatorAction.MemorySubtract, false)
-        )
-        memoryActions.forEach { (label, action, highlight) ->
-            CalculatorChip(text = label, highlight = highlight) { onAction(action) }
         }
     }
 }

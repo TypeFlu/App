@@ -3,16 +3,19 @@
 
 [versions]
 androidGradlePlugin = "8.13.0"
+junit = "4.13.2"
 kotlin = "2.2.20"
 compileSdk = "36"
-minSdk = "24"
+material = "1.14.0-alpha05"
+minSdk = "33"
 targetSdk = "36"
 composeBom = "2025.09.01"
-composeCompiler = "1.5.10"
 activityCompose = "1.11.0"
 lifecycleRuntime = "2.9.4"
 navigationCompose = "2.9.5"
 coroutines = "1.10.2"
+coil = "3.3.0" # Updated Coil version to 3.x
+composeMaterial3 = "1.5.0-alpha04"
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -20,6 +23,8 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 [libraries]
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.17.0" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntime" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntime" }
@@ -31,13 +36,17 @@ androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "composeMaterial3" }
+androidx-compose-material3-windowsize = { group = "androidx.compose.material3", name = "material3-window-size-class", version.ref = "composeMaterial3" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-ui-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts" }
+junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" } # Updated group for Coil 3
 
 [bundles]
 compose = [
@@ -46,6 +55,7 @@ compose = [
     "androidx-compose-ui-tooling-preview",
     "androidx-compose-foundation",
     "androidx-compose-material3",
+    "androidx-compose-material3-windowsize",
     "androidx-compose-runtime",
     "androidx-compose-material-icons-extended",
     "androidx-compose-ui-google-fonts"
