@@ -1,4 +1,13 @@
+import groovy.lang.Closure
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+val signingProperties = rootProject.file("signing.properties")
+    .takeIf { it.exists() }
+    ?.inputStream()
+    ?.use { stream ->
+        Properties().apply { load(stream) }
+    }
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -16,7 +25,24 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0.0"
-    vectorDrawables.useSupportLibrary = true
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    signingConfigs {
+        signingProperties?.let { props ->
+            create("release") {
+                props["keyStore"]?.toString()?.takeIf { it.isNotBlank() }?.let { path ->
+                    storeFile = file(path)
+                }
+                storePassword = props["keyStorePassword"]?.toString()
+                keyAlias = props["keyAlias"]?.toString()
+                keyPassword = props["keyPassword"]?.toString()
+                enableV1Signing = false
+                enableV2Signing = true
+                enableV3Signing = true
+                enableV4Signing = true
+            } as Closure<*>
+        }
     }
 
     buildTypes {
@@ -27,6 +53,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (signingProperties != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
