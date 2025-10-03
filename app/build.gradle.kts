@@ -1,4 +1,3 @@
-import groovy.lang.Closure
 import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -28,20 +27,18 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
-    signingConfigs {
-        signingProperties?.let { props ->
-            create("release") {
-                props["keyStore"]?.toString()?.takeIf { it.isNotBlank() }?.let { path ->
-                    storeFile = file(path)
-                }
-                storePassword = props["keyStorePassword"]?.toString()
-                keyAlias = props["keyAlias"]?.toString()
-                keyPassword = props["keyPassword"]?.toString()
-                enableV1Signing = false
-                enableV2Signing = true
-                enableV3Signing = true
-                enableV4Signing = true
-            } as Closure<*>
+    val releaseSigningConfig = signingProperties?.let { props ->
+        signingConfigs.maybeCreate("release").apply {
+            props["keyStore"]?.toString()?.takeIf { it.isNotBlank() }?.let { path ->
+                storeFile = file(path)
+            }
+            storePassword = props["keyStorePassword"]?.toString()
+            keyAlias = props["keyAlias"]?.toString()
+            keyPassword = props["keyPassword"]?.toString()
+            enableV1Signing = false
+            enableV2Signing = true
+            enableV3Signing = true
+            enableV4Signing = true
         }
     }
 
@@ -53,9 +50,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            if (signingProperties != null) {
-                signingConfig = signingConfigs.getByName("release")
-            }
+            signingConfig = releaseSigningConfig ?: signingConfigs.getByName("debug")
         }
     }
 
@@ -69,7 +64,7 @@ android {
         buildConfig = false
     }
     androidResources {
-        localeFilters += setOf("en")
+        localeFilters += "en"
     }
 
     sourceSets.named("main") {
